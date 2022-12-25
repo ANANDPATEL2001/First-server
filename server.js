@@ -1,16 +1,46 @@
-const http = require("http");
+const express = require("express");
 const port = 8081;
 
-http
-    .createServer((req, res) => {
-        res.writeHead(200, { "Content-Type": "text/html" });
-        res.write("<h4>This is my first server created</h4>");
-        res.end();
-    })
-    .listen(port, () => {
-        console.log('Node.js server started on port ${port}');
+const toDoList = ["Need to learn", "Need to code"];
+
+// Initialisation of express
+const app = express();
+app.use(express.json());
+
+app.get("/hello", (req, res) => {
+    res.status(200).send(toDoList)
+});
+
+app.post("/hello", (req, res) => {
+    let newToDoItem = req.body.item;
+    toDoList.push(newToDoItem);
+    res.status(201).send({
+        message: `${req.body.item} is successfully added`,
     });
+});
 
-// In package.JSON file "dev" : "nodemon server.js" is added to run the server automatically when changes are made in the file 
+app.delete("/hello", (req, res) => {
+    let newToDoItem = req.body.item;
+    toDoList.find((data, index) => {
+        if (data === newToDoItem)
+            toDoList.splice(index, 1);
+    });
+    res.status(201).send({
+        message: `${req.body.item} is successfully deleted`,
+    });
+});
 
-// In Network under inspect on the UI favicon.ico is like font-awsome which take the request for icon over the tab if if i.e. globe icon 
+// Below are the general cases which need to be implemented at the last
+// Below one is general case for all other methods except all stated above if implemented
+app.all("/hello",(req,res) => {
+    res.status(501).send();
+});
+
+// Below one is general case for all other routes(url) except all stated above if implemented
+app.all("*",(req,res) => {
+    res.status(404).send();
+});
+
+app.listen(port, () => {
+    console.log(`Your server started at ${port}`);
+});
